@@ -15,16 +15,16 @@ PopMed is a tool for researchers who want to stay up to date with AI in healthca
 
 ## Features
 
-- **Live PubMed feed** — pulls real peer-reviewed papers every session via NCBI's free public API. No API key needed, ever.
-- **Swipeable cards** — left to open the article, right to skip, up to save to your reading queue
-- **Reading queue** — save articles mid-session and come back to them at the end
-- **Personal library** — save any article with a written note, edit notes anytime, remove when done
-- **Topic filters** — AI + Health, Clinical NLP, Imaging AI
-- **Custom keywords** — add up to 8 terms (e.g. `atrial fibrillation`, `OMOP`, `RAG`) to narrow your PubMed search
-- **Session length** — choose 5 (Quick), 10 (Standard), or 15+ (Deep dive) articles per session
-- **Randomised feeds** — each session pulls a fresh shuffled set so you never see the same papers twice
-- **iPhone widget** — Scriptable home screen widget showing today's top 3 papers
-- **Web app** — full browser version, works on desktop and iPhone Safari, installable as a home screen app
+- **Live PubMed feed** - pulls real peer-reviewed papers every session via NCBI's free public API. No API key needed, ever.
+- **Swipeable cards** - left to open the article, right to skip, up to save to your reading queue
+- **Reading queue** - save articles mid-session and come back to them at the end
+- **Personal library** - save any article with a written note, edit notes anytime, remove when done
+- **Topic filters** - AI + Health, Clinical NLP, Imaging AI
+- **Custom keywords** - add up to 8 terms (e.g. `atrial fibrillation`, `OMOP`, `RAG`) to narrow your PubMed search
+- **Session length** - choose 5 (Quick), 10 (Standard), or 15+ (Deep dive) articles per session
+- **Randomised feeds** - each session pulls a fresh shuffled set so you never see the same papers twice
+- **iPhone widget** - Scriptable home screen widget showing today's top 3 papers
+- **Web app** - full browser version, works on desktop and iPhone Safari, installable as a home screen app
 
 ---
 
@@ -36,7 +36,7 @@ PopMed is a tool for researchers who want to stay up to date with AI in healthca
 2. Open Chrome and go to `chrome://extensions`
 3. Toggle **Developer mode** ON (top right corner)
 4. Click **Load unpacked** and select the unzipped folder
-5. Pin the extension to your toolbar and click to open
+5. Click on Details to pin the extension to your toolbar and click to open.
 
 > No account, no API key, no sign-up required.
 
