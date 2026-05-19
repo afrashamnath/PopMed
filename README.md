@@ -44,20 +44,6 @@ PopMed is a tool for researchers who want to stay up to date with AI in healthca
 
 Send them the zip file. Same four steps above — installs in under a minute.
 
-### Web App (browser / iPhone)
-
-1. Push this repo to GitHub (see Hosting section below)
-2. Enable GitHub Pages
-3. Open `https://yourusername.github.io/popmed/web-app.html` in any browser
-4. On iPhone: open in **Safari** → tap **Share** → **Add to Home Screen** — it installs like a native app
-
-### iPhone Widget
-
-1. Download **Scriptable** (free) from the App Store
-2. Open Scriptable → tap **+** → paste the contents of `iphone-widget.js`
-3. Tap **Run** to preview
-4. Long-press your home screen → **+** → search **Scriptable** → choose Medium widget → configure → select the script
-
 
 ---
 
