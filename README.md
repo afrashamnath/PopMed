@@ -1,6 +1,6 @@
 # PopMed
 
-PopMed is a lightweight tool for researchers, clinicians, and students who want to stay current with AI in healthcare. Swipe left to read, right to skip, up to queue for later. Save PubMed articles to your library with notes. Filter by topic and add custom keywords. Available as a Chrome extension, no login, no API key.
+PopMed is a tool for researchers who want to stay up to date with AI in healthcare scholarly articles. Swipe left to read, right to skip, up to queue for later. Save PubMed articles to your library with notes. Filter by topic and add custom keywords. Available as a Chrome extension, no login, no API key.
 
 ---
 
