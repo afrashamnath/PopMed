@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PopMed</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{border-radius:18px;outline:none;position:relative;}body{width:380px;min-height:560px;outline:none;font-family:-apple-system,'SF Pro Display','SF Pro Text',BlinkMacSystemFont,'Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;background:#000957;border-radius:18px;}
+
+:root{
+  --c1:#000957;
+  --c2:#48B3AF;
+  --c3:#A7E399;
+  --c4:#F6FF99;
+}
+
+.screen{display:none;width:380px;min-height:560px;border-radius:18px;outline:none;}
+.screen.active{display:flex;flex-direction:column;border-radius:18px;}
+
+/* SETTINGS */
+#s-settings{background:#000957;padding:28px 20px 22px;}
+.s-eye{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:6px;}
+.s-title{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.04em;margin-bottom:26px;}
+.s-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px;}
+.s-div{height:1px;background:rgba(255,255,255,0.12);margin-bottom:20px;}
+
+.count-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:26px;}
+.count-opt{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:2px solid transparent;position:relative;overflow:hidden;cursor:pointer;transition:filter .15s;}
+.count-opt:hover{filter:brightness(1.12);}
+.count-opt.active{border-color:rgba(255,255,255,0.9);}
+.c-num{font-size:36px;font-weight:700;letter-spacing:-.04em;color:#fff;}
+.c-name{font-size:11px;font-weight:600;color:rgba(255,255,255,0.8);}
+.c-time{font-size:10px;font-weight:500;padding:2px 9px;background:rgba(0,0,0,0.2);color:rgba(255,255,255,0.85);margin-top:2px;}
+.c-chk{position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--c1);opacity:0;transition:opacity .15s;}
+.count-opt.active .c-chk{opacity:1;}
+
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:22px;}
+.mode-opt{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:12px 8px;text-align:center;border:2px solid transparent;position:relative;overflow:hidden;cursor:pointer;transition:filter .15s;}
+.mode-opt:hover{filter:brightness(1.12);}
+.mode-opt.active{border-color:rgba(255,255,255,0.9);}
+.mode-opt svg{width:22px;height:22px;stroke:rgba(255,255,255,0.92);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.m-name{font-size:12px;font-weight:700;color:#fff;}
+.m-desc{font-size:9px;color:rgba(255,255,255,0.6);line-height:1.4;}
+.m-chk{position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--c1);opacity:0;transition:opacity .15s;}
+.mode-opt.active .m-chk{opacity:1;}
+
+.apply-btn{width:100%;padding:17px;border-radius:14px;background:#F6FF99;color:#1a3a5c;font-size:15px;font-weight:700;letter-spacing:-.02em;border:none;cursor:pointer;font-family:inherit;transition:filter .15s;}
+.apply-btn:hover{filter:brightness(1.08);}
+.apply-btn:active{filter:brightness(.92);}
+.kw-div{height:1px;background:rgba(255,255,255,0.12);margin-bottom:20px;margin-top:0;}
+.kw-wrap{margin-bottom:20px;}
+.kw-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;min-height:32px;}
+.kw-tag{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.28);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:500;color:#fff;}
+.kw-tag-x{background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:13px;line-height:1;padding:0;font-family:inherit;display:flex;align-items:center;}
+.kw-tag-x:hover{color:#FF6B8A;}
+.kw-input-row{display:flex;gap:6px;}
+.kw-input{flex:1;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;padding:9px 12px;font-size:12px;color:#fff;font-family:inherit;outline:none;}
+.kw-input::placeholder{color:rgba(255,255,255,0.3);}
+.kw-input:focus{border-color:rgba(167,227,153,0.6);background:rgba(255,255,255,0.12);}
+.kw-add{background:#A7E399;color:#1a3a1a;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:filter .15s;}
+.kw-add:hover{filter:brightness(1.08);}
+.kw-hint{font-size:10px;color:rgba(255,255,255,0.28);margin-top:6px;line-height:1.5;}
+
+/* LOADING */
+#s-loading{background:#000957;align-items:center;justify-content:center;gap:12px;}
+.ld-dots span{animation:ldot 1.2s ease infinite;font-size:26px;color:#F6FF99;}
+.ld-dots span:nth-child(2){animation-delay:.2s}
+.ld-dots span:nth-child(3){animation-delay:.4s}
+@keyframes ldot{0%,80%,100%{opacity:.15}40%{opacity:1}}
+.ld-lbl{font-size:12px;color:rgba(255,255,255,0.4);font-weight:500;letter-spacing:.04em;}
+
+/* FEED */
+#s-feed{background:#000957;padding:18px 20px 14px;align-items:center;}
+.f-bar{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:6px;}
+.f-name{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.f-right{display:flex;align-items:center;gap:7px;}
+.f-ctr{font-size:11px;color:rgba(255,255,255,0.35);}
+.f-qbadge{display:flex;align-items:center;gap:4px;background:rgba(246,255,153,0.18);border:1px solid rgba(246,255,153,0.5);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;color:#2a3f00;cursor:pointer;}
+.f-qbadge.hidden{display:none;}
+.f-sbtn{width:26px;height:26px;background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;}
+.f-sbtn:hover{background:rgba(255,255,255,0.18);color:#fff;}
+.f-hints{display:flex;gap:14px;margin-bottom:12px;align-self:flex-start;}
+.f-hint{font-size:10px;color:rgba(255,255,255,0.3);font-weight:500;}
+
+.deck{position:relative;width:334px;height:334px;margin-bottom:16px;}
+.card{position:absolute;width:334px;height:334px;border-radius:20px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;will-change:transform;cursor:grab;}
+.card:active{cursor:grabbing;}
+.deco{position:absolute;border-radius:50%;opacity:.2;pointer-events:none;}
+.ctag{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;align-self:flex-start;border-radius:14px;}
+.cbody{flex:1;display:flex;flex-direction:column;justify-content:flex-end;}
+.ctitle{font-size:16px;font-weight:700;line-height:1.3;margin-bottom:8px;letter-spacing:-.02em;}
+.cauths{font-size:10px;margin-bottom:6px;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmeta{display:flex;align-items:center;justify-content:space-between;font-size:9.5px;font-weight:600;opacity:.55;text-transform:uppercase;letter-spacing:.04em;}
+.sov{position:absolute;inset:0;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px;font-weight:800;letter-spacing:.06em;opacity:0;pointer-events:none;gap:4px;}
+.sov span{font-size:10px;font-weight:500;opacity:.8;letter-spacing:.04em;}
+.sov-l{background:rgba(45,10,110,.6);color:#FF3D78;}
+.sov-r{background:rgba(45,10,110,.6);color:#91D06C;}
+.sov-u{background:rgba(45,10,110,.6);color:#F6FF99;}
+
+.f-ctrl{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.f-btn{width:36px;height:36px;background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:background .15s;}
+.f-btn:hover{background:rgba(255,255,255,0.2);color:#fff;}
+.f-lbl{font-size:10px;font-weight:500;color:rgba(255,255,255,0.3);}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:5px;height:5px;border-radius:14px;background:rgba(255,255,255,0.2);transition:all .25s;}
+.dot.active{width:18px;}
+.f-qbtn{background:rgba(245,168,0,0.15);border:1px solid rgba(245,168,0,0.4);padding:6px 16px;font-size:11px;font-weight:600;color:var(--c4);cursor:pointer;font-family:inherit;border-radius:14px;}
+.f-qbtn:hover{background:rgba(245,168,0,0.25);}
+
+/* QUEUE */
+#s-queue{background:#000957;padding:20px 20px 16px;align-items:center;}
+.q-hdr{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:14px;}
+.q-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.q-back{font-size:12px;color:var(--c4);cursor:pointer;font-weight:600;background:none;border:none;font-family:inherit;padding:4px 8px;}
+.q-list{width:100%;display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:460px;scrollbar-width:none;}
+.q-list::-webkit-scrollbar{display:none;}
+.qi{border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;position:relative;overflow:hidden;transition:opacity .15s;}
+.qi:hover{opacity:.85;}
+.qi-n{font-size:11px;font-weight:700;opacity:.4;min-width:14px;}
+.qi-b{flex:1;min-width:0;}
+.qi-t{font-size:12px;font-weight:600;line-height:1.35;margin-bottom:3px;}
+.qi-m{font-size:10px;opacity:.5;display:flex;gap:6px;}
+.qi-arr{font-size:13px;opacity:.6;}
+.qi-deco{position:absolute;border-radius:50%;opacity:.15;pointer-events:none;}
+.q-empty{font-size:13px;color:rgba(255,255,255,0.3);text-align:center;padding:50px 0;}
+
+/* DONE */
+#s-done{background:#000957;align-items:center;justify-content:center;padding:24px;}
+.done-icon{font-size:44px;margin-bottom:12px;}
+.done-title{font-size:24px;font-weight:700;color:#fff;letter-spacing:-.03em;margin-bottom:6px;}
+.done-sub{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:24px;text-align:center;line-height:1.5;}
+.done-btns{display:flex;gap:6px;}
+.done-btn{padding:12px 22px;border-radius:14px;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;}
+.done-btn:hover{filter:brightness(1.1);}
+
+.toast{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:#48B3AF;color:#fff;padding:7px 16px;border-radius:20px;font-size:11px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:9999;letter-spacing:.02em;}
+.toast.show{opacity:1;}
+
+/* LIBRARY */
+.lib-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.lib-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.38);}
+.lib-back{font-size:12px;color:#A7E399;cursor:pointer;font-weight:600;background:none;border:none;font-family:inherit;padding:4px 8px;}
+
+
+
+.lib-body{flex:1;overflow-y:auto;padding:14px 20px;scrollbar-width:none;}
+.lib-body::-webkit-scrollbar{display:none;}
+.lib-empty{text-align:center;padding:50px 0;font-size:13px;color:rgba(255,255,255,0.25);line-height:1.7;}
+.lib-item{border-radius:14px;margin-bottom:10px;overflow:hidden;position:relative;border:1.5px solid rgba(255,255,255,0.12);}
+.lib-item-top{padding:13px 13px 9px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:filter .15s;}
+.lib-item-top:hover{filter:brightness(1.06);}
+.lib-num{font-size:11px;font-weight:700;opacity:.38;min-width:15px;padding-top:2px;}
+.lib-content{flex:1;min-width:0;}
+.lib-tag-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.lib-ptag{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:20px;}
+.lib-saved-at{font-size:9px;opacity:.4;}
+.lib-item-title{font-size:12px;font-weight:600;line-height:1.4;margin-bottom:3px;}
+.lib-item-meta{font-size:10px;opacity:.45;display:flex;gap:6px;}
+.lib-arr{font-size:13px;opacity:.45;padding-top:2px;}
+.lib-note-area{padding:0 13px 12px 38px;}
+.lib-note-box{width:100%;background:rgba(0,0,0,0.22);border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;padding:8px 10px;font-size:11px;color:#fff;font-family:inherit;resize:none;outline:none;line-height:1.5;min-height:58px;}
+.lib-note-box::placeholder{color:rgba(255,255,255,0.25);}
+.lib-note-box:focus{border-color:rgba(167,227,153,0.5);}
+.lib-note-actions{display:flex;align-items:center;justify-content:space-between;margin-top:6px;}
+.lib-save-note{background:#A7E399;color:#1a3a1a;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.lib-del{background:none;border:none;color:rgba(255,100,100,0.5);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;}
+.lib-item-deco{position:absolute;border-radius:50%;opacity:.12;pointer-events:none;}
+/* NOTE MODAL */
+.note-modal-bg{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,5,40,0.88);display:flex;align-items:flex-end;justify-content:center;z-index:500;opacity:0;transition:opacity .2s;pointer-events:none;}
+.note-modal-bg.open{opacity:1;pointer-events:all;}
+.note-modal{background:#0a1540;border-radius:18px 18px 0 0;padding:20px 20px 26px;width:380px;border-top:1px solid rgba(255,255,255,0.1);transform:translateY(30px);transition:transform .25s cubic-bezier(.17,.67,.35,1.2);}
+.note-modal-bg.open .note-modal{transform:translateY(0);}
+.nm-title{font-size:13px;font-weight:700;color:#fff;letter-spacing:-.01em;margin-bottom:4px;line-height:1.3;padding-right:26px;}
+.nm-sub{font-size:10px;color:rgba(255,255,255,0.38);margin-bottom:12px;}
+.nm-textarea{width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.16);border-radius:12px;padding:10px 12px;font-size:12px;color:#fff;font-family:inherit;resize:none;outline:none;line-height:1.5;height:80px;}
+.nm-textarea::placeholder{color:rgba(255,255,255,0.25);}
+.nm-textarea:focus{border-color:rgba(167,227,153,0.5);}
+.nm-actions{display:flex;gap:8px;margin-top:10px;}
+.nm-save{flex:2;padding:12px;border-radius:10px;background:#A7E399;color:#1a3a1a;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;}
+.nm-skip{flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.55);font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:inherit;}
+.nm-cancel{position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,0.35);font-size:20px;cursor:pointer;line-height:1;}
+#s-library{background:#000957;padding:0;align-items:stretch;}
+
+/* CARD LIBRARY BUTTON */
+.card-save-btn{
+  position:absolute;
+  top:14px;right:14px;
+  background:rgba(255,255,255,0.22);
+  border:2px solid rgba(255,255,255,0.5);
+  border-radius:999px;
+  padding:5px 13px;
+  font-size:10px;font-weight:700;
+  color:#fff;
+  cursor:pointer;font-family:inherit;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  transition:all .2s;
+  z-index:10;
+}
+.card-save-btn:hover{
+  background:rgba(255,255,255,0.35);
+  border-color:rgba(255,255,255,0.8);
+}
+.card-save-btn.saved{
+  background:rgba(167,227,153,0.35);
+  border-color:#A7E399;
+  color:#A7E399;
+}
+</style>
+</head>
+<body>
+
+<div id="s-settings" class="screen active">
+  <div class="s-eye">PopMed</div>
+  <div class="s-title">Settings</div>
+  <div class="s-lbl">Articles per session</div>
+  <div class="count-grid">
+    <div class="count-opt active" data-v="5" style="background:#476EAE;">
+      <div class="c-chk">&#10003;</div>
+      <div class="c-num">5</div><div class="c-name">Quick</div><div class="c-time">~2 min</div>
+    </div>
+    <div class="count-opt" data-v="10" style="background:#48B3AF;">
+      <div class="c-chk">&#10003;</div>
+      <div class="c-num">10</div><div class="c-name">Standard</div><div class="c-time">~5 min</div>
+    </div>
+    <div class="count-opt" data-v="15" style="background:#A7E399;">
+      <div class="c-chk" style="color:#7B00FF;">&#10003;</div>
+      <div class="c-num" style="color:#1a3a5c;">15+</div>
+      <div class="c-name" style="color:rgba(26,58,92,0.85);">Deep dive</div>
+      <div class="c-time" style="background:rgba(26,58,92,0.12);color:rgba(26,58,92,0.8);">~10 min</div>
+    </div>
+  </div>
+  <div class="s-div"></div>
+  <div class="s-lbl">Topic focus</div>
+  <div class="mode-grid">
+    <div class="mode-opt active" data-m="ai" style="background:#476EAE;">
+      <div class="m-chk">&#10003;</div>
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="0"/><path d="M8 6V4m8 2V4M3 11h18"/></svg>
+      <div class="m-name">AI + Health</div><div class="m-desc">LLMs &middot; clinical AI</div>
+    </div>
+    <div class="mode-opt" data-m="nlp" style="background:#48B3AF;">
+      <div class="m-chk">&#10003;</div>
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div class="m-name">NLP</div><div class="m-desc">EHR &middot; text mining</div>
+    </div>
+    <div class="mode-opt" data-m="imaging" style="background:#A7E399;">
+      <div class="m-chk" style="color:#476EAE;">&#10003;</div>
+      <svg viewBox="0 0 24 24" style="stroke:rgba(30,60,100,0.8)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <div class="m-name" style="color:#1a3a5c;">Imaging AI</div>
+      <div class="m-desc" style="color:rgba(26,58,92,0.7);">radiology &middot; vision</div>
+    </div>
+  </div>
+  <div class="kw-div"></div>
+  <div class="s-lbl">Custom keywords</div>
+  <div class="kw-wrap">
+    <div class="kw-tags" id="kwTags"></div>
+    <div class="kw-input-row">
+      <input class="kw-input" id="kwInput" type="text" placeholder="e.g. atrial fibrillation, OMOP, RAG&hellip;" maxlength="50"/>
+      <button class="kw-add" id="kwAdd">+ Add</button>
+    </div>
+    <div class="kw-hint">Keywords are added to your PubMed search alongside the topic filter above.</div>
+  </div>
+  <button class="apply-btn" id="applyBtn">Start feed &#8594;</button>
+</div>
+
+<div id="s-loading" class="screen">
+  <div class="ld-dots"><span>&middot;</span><span>&middot;</span><span>&middot;</span></div>
+  <div class="ld-lbl">Fetching from PubMed&hellip;</div>
+</div>
+
+<div id="s-feed" class="screen">
+  <div class="f-bar">
+    <span class="f-name">PopMed</span>
+    <div class="f-right">
+      <span class="f-ctr" id="fCtr">1 / 5</span>
+      <div class="f-qbadge hidden" id="qBadge">&#8679; <span id="qCnt">0</span></div>
+      <button class="f-sbtn" id="fSettingsBtn">&#9881;</button>
+    </div>
+  </div>
+  <div class="f-hints">
+    <span class="f-hint">&#8592; read</span>
+    <span class="f-hint">&#8594; skip</span>
+    <span class="f-hint">&#8593; queue</span>
+  </div>
+  <div class="deck" id="deck"></div>
+  <div class="f-ctrl">
+    <button class="f-btn" id="readBtn">&#8592;</button>
+    <span class="f-lbl">read</span>
+    <div class="dots" id="dots"></div>
+    <span class="f-lbl">skip</span>
+    <button class="f-btn" id="skipBtn">&#8594;</button>
+  </div>
+  <button class="f-qbtn" id="queueBtn">&#8593; Save to queue</button>
+</div>
+
+<div id="s-queue" class="screen">
+  <div class="q-hdr">
+    <span class="q-title">Reading queue</span>
+    <button class="q-back" id="qBack">&#8592; Back</button>
+  </div>
+  <div class="q-list" id="qList"></div>
+</div>
+
+<div id="s-done" class="screen">
+  <div class="done-icon">&#10003;</div>
+  <div class="done-title">All caught up</div>
+  <div class="done-sub" id="doneSub"></div>
+  <div class="done-btns">
+    <button class="done-btn" id="doneQBtn" style="background:#F6FF99;color:#1a3a5c;">Read queue</button>
+    <button class="done-btn" id="doneRestartBtn" style="background:#48B3AF;color:#fff;">Start over</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<!-- LIBRARY SCREEN -->
+<div id="s-library" class="screen">
+  <div class="lib-header">
+    <span class="lib-title">Library</span>
+    <button class="lib-back" id="libBack">&#8592; Back</button>
+  </div>
+
+  <div class="lib-body" id="libBody"></div>
+</div>
+
+<!-- NOTE MODAL - must be inside body before script -->
+<div class="note-modal-bg" id="noteModalBg">
+  <div class="note-modal" style="position:relative;">
+    <button class="nm-cancel" id="nmCancel">&#215;</button>
+    <div class="nm-title" id="nmTitle"></div>
+    <div class="nm-sub" id="nmSub"></div>
+    <textarea class="nm-textarea" id="nmText" placeholder="Add a note&#8230; (optional)"></textarea>
+    <div class="nm-actions">
+      <button class="nm-save" id="nmSave">Save to library</button>
+      <button class="nm-skip" id="nmSkip">Save without note</button>
+    </div>
+  </div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

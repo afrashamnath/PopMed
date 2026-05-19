@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="PopMed"/>
+<meta name="theme-color" content="#000957"/>
+<title>PopMed</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#000957;
+  --c1:#476EAE;--c2:#48B3AF;--c3:#A7E399;--c4:#F6FF99;
+  --text:#fff;--dim:rgba(255,255,255,0.45);--dimmer:rgba(255,255,255,0.25);
+}
+html,body{
+  height:100%;width:100%;
+  background:var(--bg);
+  font-family:-apple-system,'SF Pro Display','SF Pro Text',BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  color:var(--text);
+  overflow:hidden;
+}
+
+/* ── LAYOUT: full page with centred content column ── */
+.screen{display:none;height:100vh;width:100%;flex-direction:column;align-items:center;}
+.screen.active{display:flex;}
+
+.inner{
+  width:100%;
+  max-width:480px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding:0 20px;
+  overflow-y:auto;
+  scrollbar-width:none;
+}
+.inner::-webkit-scrollbar{display:none;}
+
+/* ── GLOBAL NAV BAR ── */
+.topbar{
+  width:100%;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 24px 0;
+  max-width:480px;
+  align-self:center;
+}
+.tb-logo{display:flex;align-items:center;gap:8px;}
+.tb-dot{width:8px;height:8px;border-radius:50%;background:var(--c4);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
+.tb-name{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);}
+.tb-actions{display:flex;align-items:center;gap:8px;}
+.tb-btn{
+  height:32px;border-radius:999px;
+  background:rgba(255,255,255,0.09);
+  border:1.5px solid rgba(255,255,255,0.18);
+  color:rgba(255,255,255,0.55);
+  font-size:11px;font-weight:600;letter-spacing:.03em;
+  cursor:pointer;font-family:inherit;
+  padding:0 14px;
+  transition:all .2s;
+}
+.tb-btn:hover{background:rgba(255,255,255,0.16);color:#fff;}
+.tb-badge{
+  background:rgba(246,255,153,0.15);
+  border:1.5px solid rgba(246,255,153,0.4);
+  border-radius:999px;padding:0 12px;height:32px;
+  font-size:11px;font-weight:600;color:var(--c4);
+  cursor:pointer;display:flex;align-items:center;gap:4px;
+}
+.tb-badge.hidden{display:none;}
+
+/* ── SETTINGS ── */
+#s-settings .inner{padding-top:24px;padding-bottom:32px;}
+.s-title{font-size:36px;font-weight:700;letter-spacing:-.04em;margin-bottom:8px;}
+.s-sub{font-size:14px;color:var(--dim);margin-bottom:32px;line-height:1.5;}
+.s-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dimmer);margin-bottom:12px;}
+.s-div{height:1px;background:rgba(255,255,255,0.1);margin-bottom:24px;}
+
+.count-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.count-opt{aspect-ratio:1;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:2.5px solid transparent;position:relative;overflow:hidden;cursor:pointer;transition:filter .15s;}
+.count-opt:hover{filter:brightness(1.1);}
+.count-opt.active{border-color:rgba(255,255,255,0.75);}
+.c-num{font-size:38px;font-weight:700;letter-spacing:-.04em;color:#fff;}
+.c-name{font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);}
+.c-time{font-size:10.5px;font-weight:500;padding:3px 10px;border-radius:999px;background:rgba(0,0,0,0.18);color:rgba(255,255,255,0.85);margin-top:2px;}
+.c-chk{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000957;opacity:0;transition:opacity .15s;}
+.count-opt.active .c-chk{opacity:1;}
+
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.mode-opt{aspect-ratio:1;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px 10px;text-align:center;border:2.5px solid transparent;position:relative;overflow:hidden;cursor:pointer;transition:filter .15s;}
+.mode-opt:hover{filter:brightness(1.1);}
+.mode-opt.active{border-color:rgba(255,255,255,0.75);}
+.mode-opt svg{width:26px;height:26px;stroke:rgba(255,255,255,0.92);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.m-name{font-size:13px;font-weight:700;color:#fff;}
+.m-desc{font-size:10px;color:rgba(255,255,255,0.6);line-height:1.4;}
+.m-chk{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000957;opacity:0;transition:opacity .15s;}
+.mode-opt.active .m-chk{opacity:1;}
+
+.kw-wrap{margin-bottom:28px;}
+.kw-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;min-height:34px;}
+.kw-tag{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.22);border-radius:999px;padding:5px 13px;font-size:12px;font-weight:500;color:#fff;}
+.kw-tag-x{background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;line-height:1;padding:0;font-family:inherit;}
+.kw-input-row{display:flex;gap:8px;}
+.kw-input{flex:1;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.18);border-radius:12px;padding:12px 16px;font-size:14px;color:#fff;font-family:inherit;outline:none;}
+.kw-input::placeholder{color:rgba(255,255,255,0.28);}
+.kw-input:focus{border-color:rgba(167,227,153,0.5);}
+.kw-add{background:var(--c3);color:#1a3a1a;border:none;border-radius:12px;padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+
+.apply-btn{width:100%;padding:18px;border-radius:16px;background:var(--c4);color:#1a3a00;font-size:17px;font-weight:700;letter-spacing:-.02em;border:none;cursor:pointer;font-family:inherit;transition:filter .15s;margin-bottom:12px;}
+.apply-btn:hover{filter:brightness(1.06);}
+
+/* ── LOADING ── */
+#s-loading{justify-content:center;}
+.ld-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.ld-dots span{animation:ldot 1.2s ease infinite;font-size:30px;color:var(--c4);}
+.ld-dots span:nth-child(2){animation-delay:.2s}.ld-dots span:nth-child(3){animation-delay:.4s}
+@keyframes ldot{0%,80%,100%{opacity:.1}40%{opacity:1}}
+.ld-lbl{font-size:14px;color:var(--dim);font-weight:500;letter-spacing:.04em;}
+
+/* ── FEED ── */
+#s-feed .topbar{margin-bottom:10px;}
+.f-hints{display:flex;gap:16px;padding:0 4px 12px;align-self:flex-start;width:100%;max-width:480px;align-self:center;padding-left:24px;}
+.f-hint{font-size:11px;color:var(--dimmer);font-weight:500;}
+
+.deck-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;width:100%;}
+.deck{position:relative;}
+.card{position:absolute;border-radius:22px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;will-change:transform;cursor:grab;touch-action:none;}
+.card:active{cursor:grabbing;}
+.deco{position:absolute;border-radius:50%;opacity:.18;pointer-events:none;}
+.ctag{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:5px 13px;border-radius:999px;align-self:flex-start;}
+.card-save-btn{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.22);border:2px solid rgba(255,255,255,0.5);border-radius:999px;padding:6px 16px;font-size:10.5px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;letter-spacing:.04em;text-transform:uppercase;transition:all .2s;z-index:10;}
+.card-save-btn:hover{background:rgba(255,255,255,0.35);border-color:rgba(255,255,255,0.8);}
+.card-save-btn.saved{background:rgba(167,227,153,0.3);border-color:#A7E399;color:#A7E399;}
+.cbody{flex:1;display:flex;flex-direction:column;justify-content:flex-end;}
+.ctitle{font-size:19px;font-weight:700;line-height:1.3;margin-bottom:10px;letter-spacing:-.02em;}
+.cauths{font-size:11.5px;margin-bottom:7px;opacity:.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmeta{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:600;opacity:.5;text-transform:uppercase;letter-spacing:.04em;}
+.sov{position:absolute;inset:0;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;font-weight:800;letter-spacing:.06em;opacity:0;pointer-events:none;gap:5px;}
+.sov span{font-size:11px;font-weight:500;opacity:.75;}
+.sov-l{background:rgba(0,5,40,.55);color:#6ee7b7;}
+.sov-r{background:rgba(0,5,40,.55);color:#ff8faa;}
+.sov-u{background:rgba(0,5,40,.55);color:var(--c4);}
+
+.f-controls{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:16px 0 8px;
+  width:100%;max-width:480px;align-self:center;
+}
+.f-btn{width:44px;height:44px;border-radius:999px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.5);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all .2s;}
+.f-btn:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4);color:#fff;}
+.f-lbl{font-size:11px;font-weight:500;color:var(--dimmer);}
+.dots{display:flex;gap:6px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,0.2);transition:all .25s;}
+.dot.active{width:20px;border-radius:999px;}
+.f-qbtn{background:rgba(246,255,153,0.12);border:1.5px solid rgba(246,255,153,0.35);border-radius:999px;padding:10px 24px;font-size:13px;font-weight:600;color:var(--c4);cursor:pointer;font-family:inherit;margin-bottom:24px;transition:all .2s;}
+.f-qbtn:hover{background:rgba(246,255,153,0.2);}
+
+/* ── QUEUE ── */
+#s-queue .inner{padding-top:20px;padding-bottom:24px;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-title{font-size:24px;font-weight:700;letter-spacing:-.03em;}
+.back-btn{font-size:13px;color:var(--c3);cursor:pointer;font-weight:600;background:none;border:none;font-family:inherit;padding:6px 12px;border-radius:999px;border:1.5px solid rgba(167,227,153,0.3);}
+.back-btn:hover{background:rgba(167,227,153,0.1);}
+.q-list{display:flex;flex-direction:column;gap:10px;}
+.qi{border-radius:16px;padding:15px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;position:relative;overflow:hidden;transition:opacity .15s;border:1.5px solid rgba(255,255,255,0.12);}
+.qi:hover{opacity:.85;}
+.qi-n{font-size:12px;font-weight:700;opacity:.38;min-width:18px;}
+.qi-b{flex:1;min-width:0;}
+.qi-t{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:4px;}
+.qi-m{font-size:10.5px;opacity:.5;display:flex;gap:8px;}
+.qi-arr{font-size:16px;opacity:.5;}
+.qi-deco{position:absolute;border-radius:50%;opacity:.12;pointer-events:none;}
+.q-empty{text-align:center;padding:60px 0;font-size:15px;color:var(--dimmer);line-height:1.7;}
+
+/* ── LIBRARY ── */
+#s-library .inner{padding-top:20px;padding-bottom:24px;}
+.lib-list{display:flex;flex-direction:column;gap:12px;}
+.lib-item{border-radius:16px;overflow:hidden;position:relative;border:1.5px solid rgba(255,255,255,0.12);}
+.lib-item-top{padding:15px 15px 10px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:filter .15s;}
+.lib-item-top:hover{filter:brightness(1.06);}
+.lib-num{font-size:12px;font-weight:700;opacity:.38;min-width:18px;padding-top:2px;}
+.lib-content{flex:1;min-width:0;}
+.lib-tag-row{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.lib-ptag{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;}
+.lib-saved-at{font-size:9.5px;opacity:.4;}
+.lib-item-title{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:4px;}
+.lib-item-meta{font-size:11px;opacity:.45;display:flex;gap:8px;}
+.lib-arr{font-size:16px;opacity:.45;padding-top:2px;}
+.lib-note-area{padding:0 15px 14px 45px;}
+.lib-note-box{width:100%;background:rgba(0,0,0,0.2);border:1.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 14px;font-size:13px;color:#fff;font-family:inherit;resize:none;outline:none;line-height:1.5;min-height:68px;}
+.lib-note-box::placeholder{color:rgba(255,255,255,0.25);}
+.lib-note-box:focus{border-color:rgba(167,227,153,0.5);}
+.lib-note-actions{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.lib-save-note{background:var(--c3);color:#1a3a1a;border:none;border-radius:10px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.lib-del{background:none;border:none;color:rgba(255,100,100,0.5);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+.lib-item-deco{position:absolute;border-radius:50%;opacity:.12;pointer-events:none;}
+.lib-empty{text-align:center;padding:60px 0;font-size:15px;color:var(--dimmer);line-height:1.7;}
+
+/* ── DONE ── */
+#s-done{justify-content:center;}
+.done-wrap{display:flex;flex-direction:column;align-items:center;padding:32px 24px;text-align:center;}
+.done-icon{font-size:56px;margin-bottom:16px;}
+.done-title{font-size:28px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;}
+.done-sub{font-size:15px;color:var(--dim);margin-bottom:28px;line-height:1.5;max-width:320px;}
+.done-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.done-btn{padding:14px 26px;border-radius:16px;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:filter .15s;}
+.done-btn:hover{filter:brightness(1.1);}
+
+/* ── NOTE MODAL ── */
+.note-modal-bg{position:fixed;inset:0;background:rgba(0,5,40,0.88);display:flex;align-items:flex-end;justify-content:center;z-index:500;opacity:0;transition:opacity .2s;pointer-events:none;}
+.note-modal-bg.open{opacity:1;pointer-events:all;}
+.note-modal{background:#0a1540;border-radius:24px 24px 0 0;padding:24px 24px 36px;width:100%;max-width:480px;border-top:1px solid rgba(255,255,255,0.1);transform:translateY(30px);transition:transform .25s cubic-bezier(.17,.67,.35,1.2);position:relative;}
+.note-modal-bg.open .note-modal{transform:translateY(0);}
+.nm-title{font-size:15px;font-weight:700;color:#fff;letter-spacing:-.01em;margin-bottom:5px;line-height:1.3;padding-right:30px;}
+.nm-sub{font-size:12px;color:var(--dim);margin-bottom:16px;}
+.nm-textarea{width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 16px;font-size:14px;color:#fff;font-family:inherit;resize:none;outline:none;line-height:1.5;height:90px;}
+.nm-textarea::placeholder{color:rgba(255,255,255,0.25);}
+.nm-textarea:focus{border-color:rgba(167,227,153,0.5);}
+.nm-actions{display:flex;gap:10px;margin-top:14px;}
+.nm-save{flex:2;padding:15px;border-radius:12px;background:var(--c3);color:#1a3a1a;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;}
+.nm-skip{flex:1;padding:15px;border-radius:12px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.55);font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:inherit;}
+.nm-cancel{position:absolute;top:18px;right:20px;background:none;border:none;color:rgba(255,255,255,0.35);font-size:24px;cursor:pointer;line-height:1;}
+
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:rgba(10,21,64,0.97);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:9999;}
+.toast.show{opacity:1;}
+
+/* ── DESKTOP EXTRAS ── */
+@media(min-width:600px){
+  .topbar{padding-top:28px;}
+  .s-title{font-size:42px;}
+  .ctitle{font-size:21px;}
+  .card{border-radius:26px;}
+  .sov{border-radius:26px;}
+}
+</style>
+</head>
+<body>
+
+<!-- SETTINGS -->
+<div id="s-settings" class="screen active">
+  <div class="topbar">
+    <div class="tb-logo"><div class="tb-dot"></div><span class="tb-name">PopMed</span></div>
+  </div>
+  <div class="inner">
+    <div style="height:20px;"></div>
+    <div class="s-title">Settings</div>
+    <div class="s-sub">Choose your session length, topic, and any custom keywords to narrow your PubMed feed.</div>
+
+    <div class="s-lbl">Articles per session</div>
+    <div class="count-grid">
+      <div class="count-opt active" data-v="5" style="background:linear-gradient(145deg,#476EAE,#2a4f8a);">
+        <div class="c-chk">&#10003;</div><div class="c-num">5</div><div class="c-name">Quick</div><div class="c-time">~2 min</div>
+      </div>
+      <div class="count-opt" data-v="10" style="background:linear-gradient(145deg,#48B3AF,#2a8a87);">
+        <div class="c-chk">&#10003;</div><div class="c-num">10</div><div class="c-name">Standard</div><div class="c-time">~5 min</div>
+      </div>
+      <div class="count-opt" data-v="15" style="background:linear-gradient(145deg,#5a9a4a,#2a6a1a);">
+        <div class="c-chk">&#10003;</div><div class="c-num">15+</div><div class="c-name">Deep dive</div><div class="c-time">~10 min</div>
+      </div>
+    </div>
+
+    <div class="s-div"></div>
+    <div class="s-lbl">Topic focus</div>
+    <div class="mode-grid">
+      <div class="mode-opt active" data-m="ai" style="background:linear-gradient(145deg,#476EAE,#2a4f8a);">
+        <div class="m-chk">&#10003;</div>
+        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 6V4m8 2V4M3 11h18"/></svg>
+        <div class="m-name">AI + Health</div><div class="m-desc">LLMs &middot; clinical AI</div>
+      </div>
+      <div class="mode-opt" data-m="nlp" style="background:linear-gradient(145deg,#48B3AF,#2a8a87);">
+        <div class="m-chk">&#10003;</div>
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <div class="m-name">NLP</div><div class="m-desc">EHR &middot; text mining</div>
+      </div>
+      <div class="mode-opt" data-m="imaging" style="background:linear-gradient(145deg,#5a9a4a,#2a6a1a);">
+        <div class="m-chk">&#10003;</div>
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <div class="m-name">Imaging AI</div><div class="m-desc">radiology &middot; vision</div>
+      </div>
+    </div>
+
+    <div class="s-div"></div>
+    <div class="s-lbl">Custom keywords</div>
+    <div class="kw-wrap">
+      <div class="kw-tags" id="kwTags"></div>
+      <div class="kw-input-row">
+        <input class="kw-input" id="kwInput" type="text" placeholder="e.g. atrial fibrillation, OMOP, RAG&#8230;" maxlength="50"/>
+        <button class="kw-add" id="kwAdd">+ Add</button>
+      </div>
+    </div>
+
+    <button class="apply-btn" id="applyBtn">Start feed &#8594;</button>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="s-loading" class="screen">
+  <div class="ld-wrap">
+    <div class="ld-dots"><span>&middot;</span><span>&middot;</span><span>&middot;</span></div>
+    <div class="ld-lbl">Fetching from PubMed&hellip;</div>
+  </div>
+</div>
+
+<!-- FEED -->
+<div id="s-feed" class="screen">
+  <div class="topbar">
+    <div class="tb-logo"><div class="tb-dot"></div><span class="tb-name">PopMed</span></div>
+    <div class="tb-actions">
+      <span style="font-size:12px;color:var(--dimmer);" id="fCtr">1 / 5</span>
+      <div class="tb-badge hidden" id="qBadge">&#8679; <span id="qCnt">0</span></div>
+      <button class="tb-btn" id="libBtn">Library</button>
+      <button class="tb-btn" id="fSettingsBtn">&#9881;</button>
+    </div>
+  </div>
+  <div class="f-hints" style="padding-top:6px;">
+    <span class="f-hint">&#8592; read</span>
+    <span class="f-hint">&#8594; skip</span>
+    <span class="f-hint">&#8593; queue</span>
+  </div>
+  <div class="deck-area" id="deckArea">
+    <div class="deck" id="deck"></div>
+  </div>
+  <div class="f-controls">
+    <button class="f-btn" id="readBtn" title="Read">&#8592;</button>
+    <span class="f-lbl">read</span>
+    <div class="dots" id="dots"></div>
+    <span class="f-lbl">skip</span>
+    <button class="f-btn" id="skipBtn" title="Skip">&#8594;</button>
+  </div>
+  <button class="f-qbtn" id="queueBtn">&#8593; Save to queue</button>
+</div>
+
+<!-- QUEUE -->
+<div id="s-queue" class="screen">
+  <div class="topbar">
+    <div class="tb-logo"><div class="tb-dot"></div><span class="tb-name">PopMed</span></div>
+    <button class="back-btn" id="qBack">&#8592; Back to feed</button>
+  </div>
+  <div class="inner" style="padding-top:20px;">
+    <div class="sec-hdr"><div class="sec-title">Reading queue</div></div>
+    <div class="q-list" id="qList"></div>
+  </div>
+</div>
+
+<!-- LIBRARY -->
+<div id="s-library" class="screen">
+  <div class="topbar">
+    <div class="tb-logo"><div class="tb-dot"></div><span class="tb-name">PopMed</span></div>
+    <button class="back-btn" id="libBack">&#8592; Back to feed</button>
+  </div>
+  <div class="inner" style="padding-top:20px;">
+    <div class="sec-hdr"><div class="sec-title">Library</div></div>
+    <div class="lib-list" id="libBody"></div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="s-done" class="screen">
+  <div class="done-wrap">
+    <div class="done-icon">&#10003;</div>
+    <div class="done-title">All caught up</div>
+    <div class="done-sub" id="doneSub"></div>
+    <div class="done-btns">
+      <button class="done-btn" id="doneQBtn" style="background:var(--c4);color:#1a3a00;">Read queue</button>
+      <button class="done-btn" id="doneRestartBtn" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">Start over</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="note-modal-bg" id="noteModalBg">
+  <div class="note-modal">
+    <button class="nm-cancel" id="nmCancel">&#215;</button>
+    <div class="nm-title" id="nmTitle"></div>
+    <div class="nm-sub" id="nmSub"></div>
+    <textarea class="nm-textarea" id="nmText" placeholder="Add a note&#8230; (optional)"></textarea>
+    <div class="nm-actions">
+      <button class="nm-save" id="nmSave">Save to library</button>
+      <button class="nm-skip" id="nmSkip">No note</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const COLORS=[
+  {bg:'#476EAE',tagBg:'rgba(255,255,255,0.2)',tagColor:'#fff',titleColor:'#fff',metaColor:'rgba(255,255,255,0.75)',d1:'#6B8FCC',d2:'#2a4f8a'},
+  {bg:'#48B3AF',tagBg:'rgba(255,255,255,0.2)',tagColor:'#fff',titleColor:'#fff',metaColor:'rgba(255,255,255,0.75)',d1:'#70CECA',d2:'#2a8a87'},
+  {bg:'#A7E399',tagBg:'rgba(30,80,30,0.15)',tagColor:'#1a4a1a',titleColor:'#1a3a1a',metaColor:'rgba(26,74,26,0.7)',d1:'#C5F0BA',d2:'#6ab85a'},
+  {bg:'#F6FF99',tagBg:'rgba(30,60,10,0.15)',tagColor:'#2a3a00',titleColor:'#2a3a00',metaColor:'rgba(42,58,0,0.65)',d1:'#FFFFCC',d2:'#c8d44a'},
+  {bg:'#476EAE',tagBg:'rgba(255,255,255,0.2)',tagColor:'#fff',titleColor:'#fff',metaColor:'rgba(255,255,255,0.75)',d1:'#7A9FD4',d2:'#1a3f80'},
+  {bg:'#48B3AF',tagBg:'rgba(255,255,255,0.2)',tagColor:'#fff',titleColor:'#fff',metaColor:'rgba(255,255,255,0.75)',d1:'#80D4D0',d2:'#1a7875'},
+  {bg:'#A7E399',tagBg:'rgba(30,80,30,0.15)',tagColor:'#1a4a1a',titleColor:'#1a3a1a',metaColor:'rgba(26,74,26,0.7)',d1:'#C8F0BA',d2:'#5aaa44'},
+];
+const TOPICS={
+  ai:{q:'artificial intelligence clinical decision support machine learning',label:'AI'},
+  nlp:{q:'natural language processing electronic health records clinical notes',label:'NLP'},
+  imaging:{q:'deep learning radiology medical imaging diagnosis',label:'Imaging'},
+};
+const FALLBACK=[
+  {title:'Zero-shot prompting outperforms clinician-reviewed few-shot in atrial fibrillation cohort NLP',authors:'Turchioe MR, Shamnath A et al.',journal:'npj Digital Medicine',time:'2024 Dec',url:'https://pubmed.ncbi.nlm.nih.gov/39614089/',tag:'NLP'},
+  {title:'Large language models for clinical decision support: systematic review',authors:'Johnson KW et al.',journal:'JAMIA',time:'2024 Nov',url:'https://pubmed.ncbi.nlm.nih.gov/',tag:'AI'},
+  {title:'Vision-language models for radiology report generation on CheXpert',authors:'Dalla Serra F et al.',journal:'Medical Image Analysis',time:'2024 Oct',url:'https://pubmed.ncbi.nlm.nih.gov/',tag:'Imaging'},
+  {title:'Federated learning for privacy-preserving AI across health networks',authors:'Rieke N et al.',journal:'npj Digital Medicine',time:'2024 Sep',url:'https://pubmed.ncbi.nlm.nih.gov/',tag:'AI'},
+  {title:'BERT-based models extract SDOH from clinical notes with 91% F1',authors:'Lybarger K et al.',journal:'JAMIA',time:'2024 Aug',url:'https://pubmed.ncbi.nlm.nih.gov/',tag:'NLP'},
+];
+
+let selCount=5,selTopic='ai',customKeywords=[];
+let articles=[],current=0,queue=[],cardEls=[];
+let dragging=false,startX=0,startY=0,curX=0,curY=0,dir=null;
+let library=JSON.parse(localStorage.getItem('popmedLibrary')||'[]');
+let pendingArticle=null;
+
+function persistLibrary(){localStorage.setItem('popmedLibrary',JSON.stringify(library));}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));}
+
+// Card size responsive
+function cardSize(){
+  const w=Math.min(window.innerWidth-48,440);
+  const h=Math.min(w*0.88,380);
+  return{w,h};
+}
+
+// Settings
+document.querySelectorAll('.count-opt').forEach(o=>o.addEventListener('click',()=>{
+  document.querySelectorAll('.count-opt').forEach(x=>x.classList.remove('active'));
+  o.classList.add('active');selCount=parseInt(o.dataset.v);
+}));
+document.querySelectorAll('.mode-opt').forEach(r=>r.addEventListener('click',()=>{
+  document.querySelectorAll('.mode-opt').forEach(x=>x.classList.remove('active'));
+  r.classList.add('active');selTopic=r.dataset.m;
+}));
+
+// Keywords
+function renderKwTags(){
+  const c=document.getElementById('kwTags');c.innerHTML='';
+  if(!customKeywords.length){
+    const h=document.createElement('span');h.style.cssText='font-size:12px;color:rgba(255,255,255,0.22);';
+    h.textContent='No keywords yet';c.appendChild(h);return;
+  }
+  customKeywords.forEach((kw,i)=>{
+    const t=document.createElement('div');t.className='kw-tag';
+    const l=document.createElement('span');l.textContent=kw;
+    const b=document.createElement('button');b.className='kw-tag-x';b.textContent='x';
+    b.addEventListener('click',()=>{customKeywords.splice(i,1);renderKwTags();});
+    t.appendChild(l);t.appendChild(b);c.appendChild(t);
+  });
+}
+function addKw(){
+  const inp=document.getElementById('kwInput');
+  const v=inp.value.trim().toLowerCase();
+  if(!v||customKeywords.includes(v)||customKeywords.length>=8){inp.value='';return;}
+  customKeywords.push(v);inp.value='';renderKwTags();
+}
+document.getElementById('kwAdd').addEventListener('click',addKw);
+document.getElementById('kwInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addKw();}});
+renderKwTags();
+
+document.getElementById('applyBtn').addEventListener('click',startFeed);
+document.getElementById('fSettingsBtn').addEventListener('click',()=>show('s-settings'));
+document.getElementById('readBtn').addEventListener('click',doRead);
+document.getElementById('skipBtn').addEventListener('click',doSkip);
+document.getElementById('queueBtn').addEventListener('click',doQueue);
+document.getElementById('qBadge').addEventListener('click',()=>{renderQueue();show('s-queue');});
+document.getElementById('qBack').addEventListener('click',()=>show('s-feed'));
+document.getElementById('doneQBtn').addEventListener('click',()=>{renderQueue();show('s-queue');});
+document.getElementById('doneRestartBtn').addEventListener('click',startFeed);
+document.getElementById('libBtn').addEventListener('click',()=>{renderLibrary();show('s-library');});
+document.getElementById('libBack').addEventListener('click',()=>show('s-feed'));
+document.getElementById('nmSave').addEventListener('click',()=>saveToLibrary(document.getElementById('nmText').value));
+document.getElementById('nmSkip').addEventListener('click',()=>saveToLibrary(''));
+document.getElementById('nmCancel').addEventListener('click',closeNoteModal);
+document.getElementById('noteModalBg').addEventListener('click',e=>{if(e.target===document.getElementById('noteModalBg'))closeNoteModal();});
+
+async function startFeed(){
+  queue=[];current=0;articles=[];updateBadge();show('s-loading');
+  try{
+    const kw=customKeywords.length?' AND ('+customKeywords.join(' OR ')+')':'';
+    const q=TOPICS[selTopic].q+kw;
+    const pool=Math.min(80,selCount*5);
+    const offset=Math.floor(Math.random()*40);
+    const r1=await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+encodeURIComponent(q)+'&retmax='+pool+'&retstart='+offset+'&sort=date&retmode=json');
+    const d1=await r1.json();
+    let ids=d1.esearchresult?.idlist||[];
+    if(ids.length){
+      ids=ids.sort(()=>Math.random()-0.5).slice(0,selCount);
+      const r2=await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+ids.join(',')+'&retmode=json');
+      const d2=await r2.json();const res=d2.result||{};
+      articles=ids.map((id,i)=>{
+        const a=res[id];if(!a)return null;
+        const au=(a.authors||[]).slice(0,2).map(x=>x.name).join(', ')+((a.authors||[]).length>2?' et al.':'');
+        return{title:(a.title||'').replace(/[.]$/,'').replace(/<[^>]+>/g,''),authors:au,journal:a.fulljournalname||a.source||'PubMed',time:a.pubdate?a.pubdate.split(' ').slice(0,2).join(' '):'',url:'https://pubmed.ncbi.nlm.nih.gov/'+id+'/',tag:TOPICS[selTopic].label,col:COLORS[i%COLORS.length]};
+      }).filter(Boolean);
+    }
+  }catch(e){console.error(e);}
+  if(!articles.length){
+    const s=[...FALLBACK].sort(()=>Math.random()-0.5);
+    articles=s.slice(0,selCount).map((a,i)=>({...a,col:COLORS[i%COLORS.length]}));
+  }
+  show('s-feed');buildDots();renderDeck();updateCounter();
+}
+
+function buildDots(){
+  const el=document.getElementById('dots');el.innerHTML='';
+  const n=Math.min(articles.length,8);
+  for(let i=0;i<n;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');if(i===0&&articles[0])d.style.background=articles[0].col.d1;el.appendChild(d);}
+}
+function updateDots(){
+  document.getElementById('dots').querySelectorAll('.dot').forEach((d,i)=>{
+    const on=i===current;d.classList.toggle('active',on);
+    d.style.background=on&&articles[current]?articles[current].col.d1:'rgba(255,255,255,0.2)';
+    d.style.width=on?'20px':'6px';
+  });
+}
+function updateCounter(){document.getElementById('fCtr').textContent=(Math.min(current+1,articles.length))+' / '+articles.length;}
+function updateBadge(){document.getElementById('qCnt').textContent=queue.length;document.getElementById('qBadge').classList.toggle('hidden',queue.length===0);}
+
+function renderDeck(){
+  const deck=document.getElementById('deck');
+  deck.innerHTML='';cardEls=[];
+  const {w,h}=cardSize();
+  deck.style.width=w+'px';deck.style.height=h+'px';
+  const slice=articles.slice(current,current+3);
+  slice.forEach((a,i)=>{
+    const card=makeCard(a,slice.length-i,w,h);
+    if(i===1){card.style.transform='scale(0.93) translateY(14px) rotate(-2deg)';card.style.opacity='0.72';}
+    if(i===2){card.style.transform='scale(0.87) translateY(28px) rotate(-4deg)';card.style.opacity='0.42';}
+    deck.appendChild(card);cardEls.push(card);
+  });
+  if(cardEls[0])attachDrag(cardEls[0]);
+}
+
+function makeCard(a,z,w,h){
+  const c=a.col;
+  const card=document.createElement('div');card.className='card';
+  card.style.cssText='background:'+c.bg+';z-index:'+z+';width:'+w+'px;height:'+h+'px;';
+  const d1=document.createElement('div');d1.className='deco';d1.style.cssText='width:200px;height:200px;top:-60px;right:-50px;background:'+c.d1+';';card.appendChild(d1);
+  const d2=document.createElement('div');d2.className='deco';d2.style.cssText='width:120px;height:120px;bottom:-40px;left:14px;background:'+c.d2+';';card.appendChild(d2);
+  const ol=document.createElement('div');ol.className='sov sov-l';ol.innerHTML='READ<span>opens article</span>';card.appendChild(ol);
+  const or2=document.createElement('div');or2.className='sov sov-r';or2.innerHTML='SKIP<span>swipe right</span>';card.appendChild(or2);
+  const ou=document.createElement('div');ou.className='sov sov-u';ou.innerHTML='QUEUE<span>read later</span>';card.appendChild(ou);
+  const tag=document.createElement('div');tag.className='ctag';tag.textContent=a.tag;tag.style.cssText='background:'+c.tagBg+';color:'+c.tagColor+';';card.appendChild(tag);
+  const libBtn=document.createElement('button');libBtn.className='card-save-btn';
+  const saved=library.some(l=>l.url===a.url);libBtn.textContent=saved?'Saved':'+ Library';if(saved)libBtn.classList.add('saved');
+  libBtn.addEventListener('click',e=>{e.stopPropagation();if(library.some(l=>l.url===a.url)){showToast('Already in library');return;}openNoteModal(a,libBtn);});
+  card.appendChild(libBtn);
+  const body=document.createElement('div');body.className='cbody';
+  const title=document.createElement('div');title.className='ctitle';title.textContent=a.title;title.style.color=c.titleColor;body.appendChild(title);
+  if(a.authors){const au=document.createElement('div');au.className='cauths';au.textContent=a.authors;au.style.color=c.metaColor;body.appendChild(au);}
+  const meta=document.createElement('div');meta.className='cmeta';meta.style.color=c.metaColor;
+  const s1=document.createElement('span');s1.textContent=a.journal;const s2=document.createElement('span');s2.textContent=a.time;meta.appendChild(s1);meta.appendChild(s2);
+  body.appendChild(meta);card.appendChild(body);return card;
+}
+
+function attachDrag(card){
+  card.addEventListener('mousedown',onStart);card.addEventListener('touchstart',onStart,{passive:true});
+  function onStart(e){
+    dragging=true;dir=null;
+    startX=e.touches?e.touches[0].clientX:e.clientX;startY=e.touches?e.touches[0].clientY:e.clientY;
+    curX=0;curY=0;card.style.transition='none';
+    document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onEnd);
+    document.addEventListener('touchmove',onMove,{passive:true});document.addEventListener('touchend',onEnd);
+  }
+  function onMove(e){
+    if(!dragging)return;
+    curX=(e.touches?e.touches[0].clientX:e.clientX)-startX;curY=(e.touches?e.touches[0].clientY:e.clientY)-startY;
+    if(!dir){if(Math.abs(curY)>Math.abs(curX)&&Math.abs(curY)>8)dir='y';else if(Math.abs(curX)>8)dir='x';}
+    const el_l=card.querySelector('.sov-l'),el_r=card.querySelector('.sov-r'),el_u=card.querySelector('.sov-u');
+    if(dir==='y'&&curY<0){
+      card.style.transform='translateY('+curY+'px)';
+      el_u.style.opacity=Math.min(1,(Math.abs(curY)-20)/60);el_l.style.opacity=0;el_r.style.opacity=0;
+    } else if(dir==='x'){
+      card.style.transform='translateX('+curX+'px) rotate('+(curX*0.05)+'deg)';
+      el_l.style.opacity=curX<-30?Math.min(1,(Math.abs(curX)-30)/80):0;
+      el_r.style.opacity=curX>30?Math.min(1,(curX-30)/80):0;el_u.style.opacity=0;
+      if(cardEls[1]){const p=Math.min(Math.abs(curX)/130,1);cardEls[1].style.transform='scale('+(0.93+0.07*p)+') translateY('+(14-14*p)+'px) rotate('+(-2+2*p)+'deg)';cardEls[1].style.opacity=String(0.72+0.28*p);}
+    }
+  }
+  function onEnd(){
+    if(!dragging)return;dragging=false;
+    document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onEnd);
+    document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);
+    if(dir==='y'&&curY<-90)doQueue();
+    else if(dir==='x'&&curX<-100)doRead();
+    else if(dir==='x'&&curX>100)doSkip();
+    else{
+      card.style.transition='transform .4s cubic-bezier(.17,.67,.35,1.2)';card.style.transform='none';
+      card.querySelectorAll('.sov').forEach(o=>{o.style.opacity='0';});
+      if(cardEls[1]){cardEls[1].style.transition='transform .4s ease,opacity .4s ease';cardEls[1].style.transform='scale(0.93) translateY(14px) rotate(-2deg)';cardEls[1].style.opacity='0.72';}
+    }
+    dir=null;
+  }
+}
+
+function animateOut(d){
+  if(!cardEls[0])return;const card=cardEls[0];
+  const tx=d==='read'?-600:d==='skip'?600:0,ty=d==='queue'?-600:0,rot=d==='read'?-28:d==='skip'?28:0;
+  card.style.transition='transform .3s cubic-bezier(.4,0,.2,1),opacity .3s ease';
+  card.style.transform='translateX('+tx+'px) translateY('+ty+'px) rotate('+rot+'deg)';card.style.opacity='0';
+}
+function advance(){setTimeout(()=>{current++;if(current>=articles.length){showDone();return;}updateDots();updateCounter();renderDeck();},300);}
+function doRead(){animateOut('read');window.open(articles[current]?.url,'_blank');advance();}
+function doSkip(){animateOut('skip');advance();}
+function doQueue(){
+  const a=articles[current];
+  if(a&&!queue.find(q=>q.title===a.title)){queue.push(a);updateBadge();showToast('Saved to queue');}
+  else showToast('Already in queue');
+  animateOut('queue');advance();
+}
+function showDone(){
+  document.getElementById('doneSub').textContent=queue.length>0?'You have '+queue.length+' article'+(queue.length>1?'s':'')+' saved in your queue.':'Swipe up next time to save articles for later.';
+  document.getElementById('doneQBtn').style.display=queue.length?'':'none';show('s-done');
+}
+function renderQueue(){
+  const list=document.getElementById('qList');list.innerHTML='';
+  if(!queue.length){const e=document.createElement('div');e.className='q-empty';e.innerHTML='Nothing saved yet.<br>Swipe &#8593; on any card.';list.appendChild(e);return;}
+  queue.forEach((a,i)=>{
+    const item=document.createElement('div');item.className='qi';item.style.background=a.col.bg;
+    const deco=document.createElement('div');deco.className='qi-deco';deco.style.cssText='width:90px;height:90px;top:-22px;right:-18px;background:'+a.col.d1+';';item.appendChild(deco);
+    const num=document.createElement('div');num.className='qi-n';num.style.color=a.col.titleColor;num.textContent=String(i+1);item.appendChild(num);
+    const body=document.createElement('div');body.className='qi-b';
+    const t=document.createElement('div');t.className='qi-t';t.textContent=a.title;t.style.color=a.col.titleColor;body.appendChild(t);
+    const m=document.createElement('div');m.className='qi-m';m.style.color=a.col.metaColor;
+    const s1=document.createElement('span');s1.textContent=a.journal;const s2=document.createElement('span');s2.textContent=a.time;m.appendChild(s1);m.appendChild(s2);body.appendChild(m);
+    item.appendChild(body);const arr=document.createElement('div');arr.className='qi-arr';arr.textContent='->';arr.style.color=a.col.metaColor;item.appendChild(arr);
+    item.addEventListener('click',()=>window.open(a.url,'_blank'));list.appendChild(item);
+  });
+}
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
+function openNoteModal(article,btn){
+  pendingArticle={article,triggerBtn:btn};
+  document.getElementById('nmTitle').textContent=article.title;
+  document.getElementById('nmSub').textContent=article.journal+' - '+article.time;
+  document.getElementById('nmText').value='';
+  document.getElementById('noteModalBg').classList.add('open');
+  setTimeout(()=>document.getElementById('nmText').focus(),300);
+}
+function closeNoteModal(){document.getElementById('noteModalBg').classList.remove('open');pendingArticle=null;}
+function saveToLibrary(note){
+  if(!pendingArticle)return;
+  const{article,triggerBtn}=pendingArticle;
+  library.unshift({...article,note:note?note.trim():'',savedAt:Date.now()});
+  persistLibrary();
+  if(triggerBtn){triggerBtn.textContent='Saved';triggerBtn.classList.add('saved');}
+  showToast('Saved to library!');closeNoteModal();
+}
+function timeAgo(ts){if(!ts)return'';const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+function renderLibrary(){
+  const body=document.getElementById('libBody');body.innerHTML='';
+  if(!library.length){const e=document.createElement('div');e.className='lib-empty';e.innerHTML='Your library is empty.<br>Tap <b style="color:#A7E399">+ Library</b> on any card.';body.appendChild(e);return;}
+  library.forEach((item,i)=>{
+    const div=document.createElement('div');div.className='lib-item';div.style.background=item.col?item.col.bg:'#476EAE';
+    if(item.col){const deco=document.createElement('div');deco.className='lib-item-deco';deco.style.cssText='width:110px;height:110px;top:-28px;right:-22px;background:'+item.col.d1+';';div.appendChild(deco);}
+    const top=document.createElement('div');top.className='lib-item-top';top.addEventListener('click',()=>window.open(item.url,'_blank'));
+    const num=document.createElement('div');num.className='lib-num';num.style.color=item.col?item.col.titleColor:'#fff';num.textContent=String(i+1);top.appendChild(num);
+    const content=document.createElement('div');content.className='lib-content';
+    const tagRow=document.createElement('div');tagRow.className='lib-tag-row';
+    if(item.tag){const ptag=document.createElement('span');ptag.className='lib-ptag';ptag.textContent=item.tag;ptag.style.cssText=item.col?'background:'+item.col.tagBg+';color:'+item.col.tagColor+';':'background:rgba(255,255,255,0.2);color:#fff;';tagRow.appendChild(ptag);}
+    const sa=document.createElement('span');sa.className='lib-saved-at';sa.style.color=item.col?item.col.metaColor:'rgba(255,255,255,0.4)';sa.textContent=timeAgo(item.savedAt);tagRow.appendChild(sa);content.appendChild(tagRow);
+    const t=document.createElement('div');t.className='lib-item-title';t.textContent=item.title;t.style.color=item.col?item.col.titleColor:'#fff';content.appendChild(t);
+    const m=document.createElement('div');m.className='lib-item-meta';m.style.color=item.col?item.col.metaColor:'rgba(255,255,255,0.5)';
+    const ms1=document.createElement('span');ms1.textContent=item.journal;const ms2=document.createElement('span');ms2.textContent=item.time;m.appendChild(ms1);m.appendChild(ms2);content.appendChild(m);
+    top.appendChild(content);const arr=document.createElement('div');arr.className='lib-arr';arr.textContent='->';arr.style.color=item.col?item.col.metaColor:'rgba(255,255,255,0.4)';top.appendChild(arr);div.appendChild(top);
+    const na=document.createElement('div');na.className='lib-note-area';
+    const nb=document.createElement('textarea');nb.className='lib-note-box';nb.placeholder='Add a note...';nb.value=item.note||'';na.appendChild(nb);
+    const actions=document.createElement('div');actions.className='lib-note-actions';
+    const sn=document.createElement('button');sn.className='lib-save-note';sn.textContent='Save note';sn.addEventListener('click',()=>{const idx=library.indexOf(item);if(idx>-1){library[idx].note=nb.value;persistLibrary();showToast('Note saved');}});
+    const del=document.createElement('button');del.className='lib-del';del.textContent='Remove';del.addEventListener('click',()=>{library=library.filter(l=>l.url!==item.url);persistLibrary();renderLibrary();showToast('Removed');});
+    actions.appendChild(sn);actions.appendChild(del);na.appendChild(actions);div.appendChild(na);body.appendChild(div);
+  });
+}
+
+// Resize deck on window resize
+window.addEventListener('resize',()=>{if(document.getElementById('s-feed').classList.contains('active'))renderDeck();});
+</script>
+</body>
+</html>
