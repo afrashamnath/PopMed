@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use PopMed, please cite it using the metadata below."
+type: software
+authors:
+  - family-names: Shamnath
+    given-names: Afra
+    orcid: https://orcid.org/0000-0001-9785-7059
+title: PopMed
+abstract: "PopMed is a lightweight tool for researchers, clinicians, and students who want to stay current with AI in healthcare. Swipe left to read, right to skip, up to queue for later. Save PubMed articles to your library with notes. Filter by topic and add custom keywords. Available as a Chrome extension, no login, no API key."
+version: 1.0.0
+date-released: "2026-05-19"
+url: "https://github.com/afrashamnath/popmed"
+repository-code: "https://github.com/afrashamnath/popmed"
+license: MIT
+keywords:
+  - pubmed
+  - healthcare-ai
+  - chrome-extension
+  - clinical-nlp
+  - research-tools
+  - swipe-ui
+  - health-informatics
+  - literature-review
