@@ -6,12 +6,9 @@ PopMed is a lightweight tool for researchers, clinicians, and students who want 
 
 ## Screenshots
 
-> <img width="360" height="558" alt="Screenshot 2026-05-19 at 4 13 13 PM" src="https://github.com/user-attachments/assets/0120562f-4e98-45d8-ab2d-a33f13fab729" />
-<img width="379" height="579" alt="Screenshot 2026-05-19 at 4 12 13 PM" src="https://github.com/user-attachments/assets/9678315e-01c5-4d31-b4cc-bea3e3e233c3" />
-<img width="380" height="552" alt="Screenshot 2026-05-19 at 4 10 38 PM" src="https://github.com/user-attachments/assets/f3307ec3-919d-4d6f-8dfb-8ef9afcf3cb2" />
-<img width="380" height="582" alt="Screenshot 2026-05-19 at 4 10 29 PM" src="https://github.com/user-attachments/assets/67fc98c1-3d8f-42c8-b0c0-c1a88719a398" />
-<img width="379" height="596" alt="Screenshot 2026-05-19 at 4 10 15 PM" src="https://github.com/user-attachments/assets/55ac8c87-0d8f-4ef3-a73f-f4e5b771c6ee" />
-
+> <img width="379" height="596" alt="Screenshot 2026-05-19 at 4 10 15 PM" src="https://github.com/user-attachments/assets/55ac8c87-0d8f-4ef3-a73f-f4e5b771c6ee" /> <img width="380" height="582" alt="Screenshot 2026-05-19 at 4 10 29 PM" src="https://github.com/user-attachments/assets/67fc98c1-3d8f-42c8-b0c0-c1a88719a398" /> 
+<img width="380" height="552" alt="Screenshot 2026-05-19 at 4 10 38 PM" src="https://github.com/user-attachments/assets/f3307ec3-919d-4d6f-8dfb-8ef9afcf3cb2" /> 
+<img width="379" height="579" alt="Screenshot 2026-05-19 at 4 12 13 PM" src="https://github.com/user-attachments/assets/9678315e-01c5-4d31-b4cc-bea3e3e233c3" /> <img width="360" height="558" alt="Screenshot 2026-05-19 at 4 13 13 PM" src="https://github.com/user-attachments/assets/0120562f-4e98-45d8-ab2d-a33f13fab729" />
 
 
 ---
