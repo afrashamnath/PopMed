@@ -6,7 +6,8 @@ PopMed is a lightweight tool for researchers, clinicians, and students who want 
 
 ## Screenshots
 
-> *(Add screenshots here after installing — Settings screen, Feed screen, Library screen)*
+> <img width="303" height="177" alt="Screenshot 2026-05-19 at 4 07 05 PM" src="https://github.com/user-attachments/assets/662c68cf-8649-47ec-9df6-4dfdca53c6d7" />
+
 
 ---
 
@@ -55,17 +56,6 @@ Send them the zip file. Same four steps above — installs in under a minute.
 3. Tap **Run** to preview
 4. Long-press your home screen → **+** → search **Scriptable** → choose Medium widget → configure → select the script
 
----
-
-## How to Host on GitHub Pages
-
-1. Go to [github.com](https://github.com) and create a new **public** repository named `popmed`
-2. Upload all files from the unzipped folder
-3. Go to **Settings** → **Pages** → set source to **main branch / root**
-4. Click **Save** — your URL will appear within 2 minutes:
-   ```
-   https://yourusername.github.io/popmed/web-app.html
-   ```
 
 ---
 
@@ -100,7 +90,7 @@ Each session fetches up to 5× your chosen article count from a random offset in
 
 ## Author
 
-Built by [Afra Shamnath](https://github.com/yourusername) · Research Coordinator, Columbia University School of Nursing · Incoming PhD Candidate, NYU HiBRID Lab
+Built by [Afra Shamnath](https://github.com/afrashamnath) · Research Coordinator, Columbia University School of Nursing · Incoming PhD Candidate, NYU Langone Health
 
 ---
 
