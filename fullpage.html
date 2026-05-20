@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PopMed – Full Page</title>
+<style>
+  body { margin: 0; background: #000957; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  #popmed-frame { width: 380px; min-height: 560px; }
+</style>
+</head>
+<body>
+  <div id="popmed-frame"></div>
+  <script>
+    // Load the popup inside an iframe
+    const iframe = document.createElement('iframe');
+    iframe.src = 'popup.html';
+    iframe.style.cssText = 'width:380px;height:100vh;border:none;border-radius:18px;';
+    document.getElementById('popmed-frame').appendChild(iframe);
+  </script>
+</body>
+</html>
