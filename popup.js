@@ -81,6 +81,11 @@ document.getElementById('qBack').addEventListener('click',()=>show('s-feed'));
 document.getElementById('doneQBtn').addEventListener('click',()=>{renderQueue();show('s-queue');});
 document.getElementById('doneRestartBtn').addEventListener('click',startFeed);
 
+/* FULL PAGE BUTTON */
+document.getElementById('fullpageBtn').addEventListener('click',()=>{
+  chrome.tabs.create({url: chrome.runtime.getURL('fullpage.html'), active: true});
+});
+
 /* KEYWORDS */
 function renderKeywordTags(){
   const container=document.getElementById('kwTags');
@@ -219,7 +224,6 @@ function makeCard(a,z){
   const ou=document.createElement('div');ou.className='sov sov-u';
   ou.innerHTML='QUEUE<span>read later</span>';card.appendChild(ou);
 
-  /* Library button top-right - before tag so tag stays bottom-left */
   const libBtn=document.createElement('button');
   libBtn.className='card-save-btn';
   const alreadySaved=library.some(l=>l.url===a.url);
@@ -436,7 +440,6 @@ document.getElementById('noteModalBg').addEventListener('click',e=>{
 
 /* LIBRARY SCREEN */
 document.getElementById('libBack').addEventListener('click',()=>show('s-feed'));
-
 
 function timeAgo(ts){
   if(!ts)return '';
