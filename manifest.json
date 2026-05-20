@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PopMed",
-  "description": "PopMed \u2014 swipeable PubMed research cards for AI in healthcare. Read, skip, queue and annotate papers. Custom keyword filtering. No login, no API key required.",
+  "description": "PopMed — swipeable PubMed research cards for AI in healthcare. Read, skip, queue and annotate papers. Custom keyword filtering. No login, no API key required.",
   "version": "4.1",
   "action": {
     "default_popup": "popup.html",
@@ -18,5 +18,9 @@
   ],
   "host_permissions": [
     "https://eutils.ncbi.nlm.nih.gov/*"
-  ]
+  ],
+  "web_accessible_resources": [{
+    "resources": ["fullpage.html", "popup.html"],
+    "matches": ["<all_urls>"]
+  }]
 }
